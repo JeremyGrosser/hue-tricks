@@ -14,13 +14,13 @@ This is the core script for interacting with the Hue API. It's a loose wrapper a
 Each argument after the options is a key=value pair, which is passed directly to the API. For example `lights hue=0 bri=254 sat=254 on=true` will make everything very red.
 
 === arp_lights
-This script is meant to be called by the [arpalert](http://cv.arpalert.org/arpalert.html) daemon by setting `action on detect = "/usr/local/bin/arp_lights"` in it's config.
+This script is meant to be called by the http://cv.arpalert.org/arpalert.html[arpalert] daemon by setting `action on detect = "/usr/local/bin/arp_lights"` in it's config.
 
 By setting the MAC address in the main() section of this script, you can have lights turn on automatically when the given MAC is seen on the network. The intent is that you use your mobile phone's MAC here so that the lights turn on when your phone joins the wireless network.
 
 === sunrise
-Requires the [pyephem](http://rhodesmill.org/pyephem/) Python module. `pip install pyephem`
+Requires the http://rhodesmill.org/pyephem/[pyephem] Python module. `pip install pyephem`
 
 Emulates a sunrise by gradually increasing the brightness and reducing the color temperature of the light over 20 minutes.
 
-You need to set the obs.lat and obs.lon values to your location so that the time of the next sunrise may be calculated. This script is meant to run as a daemon, but it does not background itself. Use of a service watchdog like [supervisord](http://supervisord.org) is recommended.
+You need to set the obs.lat and obs.lon values to your location so that the time of the next sunrise may be calculated. This script is meant to run as a daemon, but it does not background itself. Use of a service watchdog like http://supervisord.org[supervisord] is recommended.

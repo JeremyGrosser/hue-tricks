@@ -1,0 +1,40 @@
+#!/usr/bin/env python
+import subprocess
+import sys
+
+# parameters are:
+#  - "mac adress of requestor"
+#  - "ip of requestor"
+#  - "supp. parm."
+#  - "ethernet device listening on"
+#  - "type of alert"
+#  - optional : "ethernet vendor"
+# type of alert:
+# 0: ip change
+# 1: mac address only detected but not in whithe list
+# 2: mac address in black list
+# 3: new mac address
+# 4: unauthorized arp request
+# 5: abusive number of arp request detected 
+# 6: ethernet mac address different from arp mac address
+# 7: global flood detection
+# 8: new mac adress without ip
+# 9: mac change
+
+
+def main():
+    if len(sys.argv) < 4:
+        return
+    if sys.argv[1] != 'aa:bb:cc:dd:ee:ff':
+        return
+    if sys.argv[-1] != '3':
+        return
+    subprocess.call(['/usr/local/bin/lights',
+        'on=true',
+        'ct=350',
+        'bri=254',
+    ])
+
+
+if __name__ == '__main__':
+    main()

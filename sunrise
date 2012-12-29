@@ -1,0 +1,45 @@
+#!/usr/bin/env python
+import subprocess
+import sched
+import time
+
+import ephem
+
+schedule = sched.scheduler(time.time, time.sleep)
+
+def schedule_next_sunrise():
+    obs = ephem.Observer()
+    obs.lat, obs.lon = '37.00000', '-120.0000000'
+    obs.horizon = '-0:34'
+    sun = ephem.Sun()
+    #sun.compute(obs)
+    rising = obs.next_rising(sun)
+    rising = ephem.localtime(rising)
+    print 'Next sunrise at %s' % rising
+    rising = time.mktime(rising.utctimetuple())
+    schedule.enterabs(rising, 0, lights_sunrise, [])
+
+
+def lights_sunrise():
+    print 'Beginning sunrise'
+    schedule_next_sunrise()
+    for i, ct in enumerate(range(500, 154, -34), start=1):
+        print 'Sun level', i
+        subprocess.call(['/usr/local/bin/lights',
+            'bri=%i' % (i * 25),
+            'ct=%i' % ct,
+            'transitiontime=100',
+            'on=true'
+        ])
+        time.sleep(120)
+    print 'Sunrise complete.'
+
+
+def main():
+    schedule_next_sunrise()
+    #schedule.enter(5, 0, lights_sunrise, [])
+    while True:
+        schedule.run()
+
+if __name__ == '__main__':
+    main()

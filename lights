@@ -1,0 +1,72 @@
+#!/usr/bin/env python
+import optparse
+import urllib2
+import json
+import sys
+
+HUE_IP = '192.168.1.20'
+HUE_KEY = 'ffffffffffffffffffffffffffffffff'
+
+
+class Request(urllib2.Request):
+    def __init__(self, url, data=None, headers={}, origin_req_host=None,
+                 unverifiable=False, method=None):
+        urllib2.Request.__init__(self, url, data, headers, origin_req_host,
+                                 unverifiable)
+        self.method = method
+
+    def get_method(self):
+        if self.method is not None:
+            return self.method
+        if self.has_data():
+            return 'POST'
+        else:
+            return 'GET'
+
+
+def set_light(light, **kwargs):
+    req = Request('http://%s/api/%s/lights/%i/state' % (HUE_IP, HUE_KEY, light), data=json.dumps(kwargs), method='PUT')
+    resp = urllib2.urlopen(req)
+    return json.load(resp)
+
+def set_all_lights(**kwargs):
+    req = Request('http://%s/api/%s/groups/0/action' % (HUE_IP, HUE_KEY), data=json.dumps(kwargs), method='PUT')
+    resp = urllib2.urlopen(req)
+    return json.load(resp)
+
+
+def cast_value(value):
+    if value.lower() == 'true':
+        return True
+    if value.lower() == 'false':
+        return False
+    if value.isdigit():
+        return int(value)
+    return value
+
+
+def main():
+    parser = optparse.OptionParser(usage='%prog [options] on=true bri=254 hue=12000 sat=254 ...')
+    parser.add_option('--light', '-l', default=None, action='store', type='int', dest='light')
+    options, args = parser.parse_args()
+
+    if not args:
+        parser.print_help()
+        return 1
+
+    kwargs = {}
+    for kv in args:
+        if kv.find('=') == -1:
+            parser.print_help()
+            return 1
+        key, value = kv.split('=', 1)
+        kwargs[key] = cast_value(value)
+
+    if options.light is None:
+        set_all_lights(**kwargs)
+    else:
+        set_light(options.light, **kwargs)
+
+
+if __name__ == '__main__':
+    sys.exit(main())
